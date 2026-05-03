@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>{% block title %}ParkBridge{% endblock %} — Smart Vehicle Contact</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Page-specific extras injected here */
+{% block extra_css %}{% endblock %}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ANIMATED BG LAYERS -->
+<canvas id="cv-city"></canvas>
+<canvas id="cv-rain"></canvas>
+<canvas id="cv-radar"></canvas>
+<div class="grid-ol"></div>
+<div class="vignette"></div>
+<div class="scanline"></div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="/">
+      <div class="logo-mark">🅿</div>
+      <div class="logo-text">Park<span>Bridge</span></div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-btn {% block nav_home %}{% endblock %}" href="/">Home</a>
+      <a class="nav-btn {% block nav_dash %}{% endblock %}" href="/#dashboard" onclick="showPage('dashboard');return false;">Dashboard</a>
+      <a class="nav-btn {% block nav_reg %}{% endblock %}" href="/#register" onclick="showPage('register');return false;">Register</a>
+    </div>
+    <div class="nav-status"><div class="pd"></div>SYSTEM ONLINE</div>
+  </nav>
+
+  <!-- PAGE CONTENT -->
+  {% block content %}{% endblock %}
+
+</div><!-- /app -->
+
+<!-- SHARED SCRIPTS -->
+<script src="/static/js/bg.js"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

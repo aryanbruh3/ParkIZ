@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Not Found | ParkBridge</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+body { cursor: auto; }
+#cur-dot, #cur-ring { display: none; }
+.nf-wrap {
+  max-width: 480px; margin: 0 auto; padding: 80px 24px;
+  text-align: center; position: relative; z-index: 10;
+}
+.nf-icon { font-size: 4rem; margin-bottom: 20px; }
+.nf-title { font-family: var(--font-d); font-size: 1.8rem; font-weight: 900; margin-bottom: 12px; }
+.nf-sub   { font-family: var(--font-c); color: var(--mid); line-height: 1.7; margin-bottom: 32px; }
+.plate-nf { font-family: var(--font-d); font-size: 1.4rem; color: var(--neon2); letter-spacing: 4px; background: rgba(255,77,106,.08); border: 1px solid rgba(255,77,106,.2); padding: 10px 24px; border-radius: 10px; display: inline-block; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<canvas id="cv-city"></canvas>
+<canvas id="cv-rain"></canvas>
+<div class="grid-ol"></div>
+<div class="vignette"></div>
+<div class="scanline"></div>
+<div class="toasts" id="toasts"></div>
+
+<div id="app">
+  <nav>
+    <a class="logo" href="/"><div class="logo-mark">🅿</div><div class="logo-text">Park<span>Bridge</span></div></a>
+    <div class="nav-status"><div class="pd"></div>NOT FOUND</div>
+  </nav>
+  <div class="nf-wrap">
+    <div class="nf-icon">🔍</div>
+    <div class="nf-title">Vehicle Not Found</div>
+    <div class="plate-nf">{{ vehicle_number }}</div>
+    <p class="nf-sub">This vehicle number is not registered in the ParkBridge system. The owner may not have signed up yet.</p>
+    <a href="/" class="btn btn-neon" style="display:inline-block;text-decoration:none;">← Back to ParkBridge</a>
+  </div>
+</div>
+
+<script src="/static/js/bg.js"></script>
+</body>
+</html>

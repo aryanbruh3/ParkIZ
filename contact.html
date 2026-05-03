@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Contact Owner — {{ vehicle.number }} | ParkBridge</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Hidden data for JS -->
+<span id="vehicle-no-data" data-vehicle="{{ vehicle.number }}" style="display:none;"></span>
+<span id="session-id-data" data-sid="{{ session_id }}" style="display:none;"></span>
+
+<style>
+/* ── CONTACT PAGE SPECIFIC ── */
+body { cursor: auto; }  /* Normal cursor on mobile */
+#cur-dot, #cur-ring { display: none; }
+
+.contact-wrap {
+  max-width: 540px; margin: 0 auto; padding: 24px 16px 100px;
+  position: relative; z-index: 10;
+}
+
+/* HEADER CARD */
+.vehicle-card {
+  background: var(--surface); border: 1px solid rgba(0,255,231,.2);
+  border-radius: 24px; padding: 28px 24px; text-align: center;
+  position: relative; overflow: hidden; margin-bottom: 20px;
+}
+.vehicle-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--neon2), var(--neon4), var(--neon));
+}
+.alert-ring {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,77,106,.1); border: 2px solid rgba(255,77,106,.3);
+  display: grid; place-items: center; font-size: 2rem; margin: 0 auto 16px;
+  animation: ringing 2s ease infinite;
+}
+@keyframes ringing {
+  0%,100%{ box-shadow: 0 0 0 0 rgba(255,77,106,.4); }
+  70%{ box-shadow: 0 0 0 18px rgba(255,77,106,0); }
+}
+.plate-wrap { margin: 14px 0; }
+.owner-info { font-family: var(--font-c); font-size: .9rem; color: var(--mid); margin-bottom: 4px; }
+.owner-info strong { color: var(--text); }
+.vehicle-meta { font-family: var(--font-d); font-size: .62rem; letter-spacing: .1em; color: var(--dim); margin-bottom: 20px; }
+
+/* ACTION BUTTONS */
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; border-radius: 14px; border: none; cursor: pointer;
+  font-family: var(--font-d); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+  text-decoration: none; transition: all .25s; font-weight: 700;
+}
+.action-btn-call {
+  background: linear-gradient(135deg, #00ff88, #00cc66); color: #020b14;
+  box-shadow: 0 0 20px rgba(0,255,136,.3);
+}
+.action-btn-call:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,255,136,.5); }
+.action-btn-sms {
+  background: linear-gradient(135deg, rgba(0,255,231,.15), rgba(124,58,237,.15));
+  color: var(--neon); border: 1px solid rgba(0,255,231,.3);
+}
+.action-btn-sms:hover { transform: translateY(-2px); background: rgba(0,255,231,.2); }
+
+/* DIVIDER WITH TEXT */
+.or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+.or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.or-divider span { font-family: var(--font-d); font-size: .6rem; letter-spacing: .12em; color: var(--dim); }
+
+/* CHAT BOX */
+.chat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden; margin-bottom: 16px;
+}
+.chat-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.chat-header-title { font-family: var(--font-d); font-size: .8rem; letter-spacing: .05em; }
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.2);
+  color: var(--neon4); padding: 3px 10px; border-radius: 20px;
+  font-family: var(--font-d); font-size: .55rem; letter-spacing: .1em; margin-left: auto;
+}
+#chat-messages {
+  min-height: 160px; max-height: 320px; overflow-y: auto;
+  padding: 16px; scroll-behavior: smooth;
+}
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(0,255,231,.2); border-radius: 4px; }
+.empty-chat {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 30px; color: var(--dim); font-family: var(--font-c); font-size: .85rem; text-align: center;
+}
+.empty-chat-icon { font-size: 2rem; margin-bottom: 10px; }
+
+/* CHAT INPUT */
+.chat-input-wrap {
+  padding: 14px 16px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-end;
+}
+#msg-input {
+  flex: 1; background: rgba(0,0,0,.4); border: 1px solid rgba(0,255,231,.12);
+  border-radius: 12px; padding: 12px 16px; color: var(--text);
+  font-family: var(--font-c); font-size: .9rem; outline: none;
+  transition: border-color .2s; resize: none; min-height: 46px; max-height: 120px;
+  line-height: 1.4;
+}
+#msg-input:focus { border-color: rgba(0,255,231,.4); }
+#msg-input::placeholder { color: rgba(80,120,160,.5); }
+#send-btn {
+  background: linear-gradient(135deg, rgba(0,255,231,.9), rgba(0,180,200,.9));
+  color: #020b14; border: none; border-radius: 12px;
+  padding: 12px 20px; font-family: var(--font-d); font-size: .7rem; letter-spacing: .08em;
+  text-transform: uppercase; cursor: pointer; font-weight: 700;
+  transition: all .2s; white-space: nowrap;
+}
+#send-btn:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(0,255,231,.4); }
+#send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* AI ERROR */
+#ai-error {
+  margin: 10px 16px 0;
+  padding: 12px 16px; border-radius: 10px;
+  background: rgba(255,77,106,.08); border: 1px solid rgba(255,77,106,.25);
+  font-family: var(--font-c); font-size: .84rem; color: var(--neon2);
+  line-height: 1.5;
+}
+
+/* AI NOTICE */
+.ai-notice {
+  margin: 0 0 16px; padding: 14px 18px;
+  background: rgba(124,58,237,.07); border: 1px solid rgba(124,58,237,.2);
+  border-radius: 14px; font-family: var(--font-c); font-size: .83rem; color: var(--mid); line-height: 1.6;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.ai-notice-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+/* MSG ANIMATION */
+@keyframes msgIn { from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+
+/* SHAKE */
+@keyframes shake { 0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);} }
+.shake { animation: shake .5s ease; }
+
+/* MOBILE ADJUSTMENTS */
+@media(max-width:480px){
+  .action-row { grid-template-columns: 1fr; }
+  .contact-wrap { padding: 16px 12px 80px; }
+  #chat-messages { max-height: 260px; }
+}
+</style>
+</head>
+<body>
+
+<!-- BG CANVASES (lighter version for mobile) -->
+<canvas id="cv-city"></canvas>
+<canvas id="cv-rain"></canvas>
+<canvas id="cv-radar" style="display:none;"></canvas>  <!-- hide radar on contact page -->
+<div class="grid-ol"></div>
+<div class="vignette"></div>
+<div class="scanline"></div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<div id="app">
+  <!-- MINIMAL NAV -->
+  <nav>
+    <a class="logo" href="/">
+      <div class="logo-mark">🅿</div>
+      <div class="logo-text">Park<span>Bridge</span></div>
+    </a>
+    <div class="nav-status"><div class="pd"></div>CONTACT PAGE</div>
+  </nav>
+
+  <!-- CONTACT CONTENT -->
+  <div class="contact-wrap">
+
+    <!-- VEHICLE HEADER -->
+    <div class="vehicle-card">
+      <div class="alert-ring">🚨</div>
+      <h2 style="font-family:var(--font-d);font-size:1.2rem;font-weight:900;margin-bottom:10px;">Vehicle Found</h2>
+      <div class="plate-wrap"><div class="plate">{{ vehicle.number }}</div></div>
+      <div class="vehicle-meta">{{ vehicle.type }} &nbsp;·&nbsp; {{ vehicle.color or '—' }}</div>
+      <div class="owner-info">Owner: <strong>{{ vehicle.owner.name }}</strong></div>
+    </div>
+
+    <!-- CALL & SMS BUTTONS -->
+    <div class="action-row">
+      <button class="action-btn action-btn-call" onclick="doCall('{{ vehicle.owner.phone }}')">
+        📞 Call Owner
+      </button>
+      <button class="action-btn action-btn-sms" onclick="doSMS('{{ vehicle.owner.phone }}', '{{ vehicle.number }}')">
+        💬 Send SMS
+      </button>
+    </div>
+
+    <div class="or-divider"><span>OR SEND A MESSAGE BELOW</span></div>
+
+    <!-- AI NOTICE -->
+    <div class="ai-notice">
+      <span class="ai-notice-icon">🤖</span>
+      <div>
+        <strong style="font-family:var(--font-d);font-size:.75rem;letter-spacing:.04em;">AI Message Filter Active</strong><br>
+        Please only send messages related to your car blockage situation. Off-topic messages will not be delivered.
+      </div>
+    </div>
+
+    <!-- CHAT BOX -->
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="card-ico ci-r" style="width:30px;height:30px;">💬</div>
+        <div class="chat-header-title">Send Alert Message</div>
+        <div class="ai-badge">✦ AI VERIFIED</div>
+      </div>
+
+      <div id="chat-messages">
+        {% if messages %}
+          {% for msg in messages %}
+          <div style="display:flex;flex-direction:column;align-items:flex-start;margin-bottom:14px;">
+            <div style="max-width:78%;padding:12px 16px;border-radius:16px 16px 16px 4px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);font-family:var(--font-c);font-size:.9rem;line-height:1.5;color:var(--text);">
+              {{ msg.text }}
+            </div>
+            <div style="font-family:var(--font-d);font-size:.56rem;letter-spacing:.08em;color:var(--dim);margin-top:4px;">
+              {{ msg.timestamp.strftime('%I:%M %p') }}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-chat">
+            <div class="empty-chat-icon">📭</div>
+            No messages yet. Send an alert below.
+          </div>
+        {% endif %}
+      </div>
+
+      <div id="ai-error" class="hidden"></div>
+
+      <div class="chat-input-wrap">
+        <textarea id="msg-input" placeholder="e.g. Your car is blocking my exit, please move…" rows="2"></textarea>
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <p style="font-family:var(--font-c);font-size:.78rem;color:var(--dim);text-align:center;line-height:1.6;margin-top:8px;">
+      🤖 You should message only about your car blockage situation.<br>
+      Off-topic messages are automatically blocked. Thank you!
+    </p>
+
+    <!-- PARKBRIDGE LINK -->
+    <div style="text-align:center;margin-top:24px;">
+      <a href="/" style="font-family:var(--font-d);font-size:.62rem;letter-spacing:.1em;color:var(--neon);text-decoration:none;opacity:.7;">
+        🅿 Powered by ParkBridge
+      </a>
+    </div>
+
+  </div><!-- /contact-wrap -->
+</div><!-- /app -->
+
+<script src="/static/js/bg.js"></script>
+<script src="/static/js/contact.js"></script>
+<script>
+// Direct call / SMS handlers
+window.doCall = function(phone) {
+  window.location.href = "tel:" + phone;
+};
+window.doSMS = function(phone, plate) {
+  const msg = "Hi, your vehicle " + plate + " is blocking my car. Could you please move it? Thank you.";
+  window.location.href = "sms:" + phone + "?body=" + encodeURIComponent(msg);
+};
+</script>
+</body>
+</html>
